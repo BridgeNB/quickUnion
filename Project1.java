@@ -9,6 +9,16 @@ public class Project1 {
 	private int[][] grid;
 	private ArrayList<Point> connections;
 
+	// add an int array to store input location to map
+	private int[] intMap;
+	// add an int arraylist to install pairs
+	private ArrayList<Integer> intPairs;
+	// add integer to indicate number of connections
+	private int num_connect = 0;
+	// add integer array to mark parent
+	private int[] parent = null;
+
+
 	/**
 	 * initializes UnionFind structure, grid and connection list
 	 * @param m
@@ -18,20 +28,39 @@ public class Project1 {
 	// initialize UnionFind structure
  		this.m = m;
 		this.n = n;
-		grid = new int[m][n];		
+		grid = new int[m][n];
+		intMap = new int[m * n];
+		// initiate intMap
+		for (int i = 0; i < m * n; i++) 
+			intMap[i] = i;
+
 	}
 
 	/**
 	 * Reads input from user (pair of connections presented as points), store the input in a list  
 	 */
 	public void read_input() {
-		int num_connect = 0;
+		String inputLine = null;
+		String[] twoLocation;
 
 		StdIn si = new StdIn(System.in);
 		System.out.println("Enter number of pairs of connections: ");
 		num_connect = si.readInt();
 
-		
+		// initiate intPairs
+		intPairs = new int[num_connect * 2];
+
+		for (int i = 0; i < num_connect; i++) {
+			// Read next line
+			inputLine = si.nextline();
+			twoLocation = inputLine.split(" ");
+			Point p1 = new Point(twoLocation[0], twoLocation[1]);
+			int intP1 = map(p1);
+			intPairs.add(intP1);
+			Point p2 = new Point(twoLocation[2], twoLocation[3]);
+			int intP2 = map(p2);
+			intPairs.add(intP2);
+		}
 		
 	}
 
@@ -79,7 +108,28 @@ public class Project1 {
 	 * scans connections and populates UnionFind structure
 	 */
 	public void process_connections(){
-		
+		// define parent count
+		int parent_count = 0;
+		// initiate weightedquickunion
+		uf = new WeightedQuickUnionUF(m*n);
+		// weighted quick union
+		int size_arraylistConnect = intpairs.size();
+		for (int i = 0; i < size_arraylistConnect - 1; i++) {
+			int p = intpairs[i];
+			int q = intpairs[i + 1];
+			if (uf.connected(p, q)) continue;
+            uf.union(p, q);
+            StdOut.println(p + " " + q);
+		}
+		parent = uf.getParent();
+
+		// Put parent array into grid
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) ｛
+				gird[m][n] = parent[count];
+				count++;
+			}
+		}
 
 	}
 
@@ -88,7 +138,23 @@ public class Project1 {
 	 * @return connected sets
 	 */	
 	public ArrayList<Point> retrieve_connected_sets() {
+		// initiate point arraylist
 		new ArrayList<Point> listp = new ArrayList<Point>();
+		// define first parent point
+		// ************** do I need always check null? ************
+		int tem = 0;
+		// transfer integer array to arraylist
+		for (int i = 0; i < parent.length; i++) {
+			// traversal parent array and put its value to point array list
+			if (parent[i] != tem) {
+				Point temp = unmap(parent[i]);
+				listp.add(temp);
+				// renew tem value
+				tem = parent[i];
+			}
+		}
+
+		return listp;
 	}
 
 	/**
@@ -116,12 +182,96 @@ public class Project1 {
 	}
 
 	/**
+	* The purpose of this function is to 
+	*/
+	public int[] findBundaries(int candidate) {
+		// int[0] Xmin; int[1] Xmax; int[2] Ymin; int[3] Ymax
+		int[] boundaryValue = new int[4];
+		
+		int Xmin = 0;
+		int Xmax = 0;
+		int Ymin = 0;
+		int Ymax = 0;
+
+		for (int i = 0; i < m; i++) {
+			for (int j = 0; j < n; j++) ｛
+				if (gird[m][n] == candidate) {
+					if (m < Xmin)
+						Xmin = m;
+					if (m > Xmax)
+						Xmax = m;
+					if (n < Ymin)
+						Ymin = n;
+					if (n > Ymax)
+						Ymax = n; 
+				}
+				
+			}
+		}
+
+		boundaries[0] = Xmin;
+		boundaries[1] = Xmax;
+		boundaries[2] = Ymin;
+		boundaries[3] = Ymax;
+
+		return bundaryValue;
+	}
+
+	/**
 	 * outputs the boundaries and size of each connected set
 	 * @param sets
 	 */
 	public void output_boundaries_size(ArrayList<Point> sets) {
-		
+		// need to find set numeber - parents number perhaps
+
+		// define an arraylist for recording set size 
+		new ArrayList<integer> setofSetSize = new Arraylist<integer>();
+		// size of parent point
+		int parentSize = sets.size();
+		// set size count
+		int setSize = 0;
+
+		// find corresponding arraylist size
+		for (int cs = 0; cs < sets.size(); cs++) {
+			Point temP = sets.get(cs);
+			int temI = map(temP);
+			// count set size
+			for (int ps = 0; ps < parent.length; ps++) {
+				if (parent[ps] == temI)
+					setSize++;
+			}
+			// store corresponding size value into setSize
+			setofSetSize.add(setSize);
+			// reset setSize value;
+			setSize = 0;
+		}
+
+		// output the result
+		System.out.println("number of sets: %d", parentSize);
+		// print second part of the result
+		for (int i = 0; i < parentSize; i++) {
+			//Point parent = unmap(sets[i])
+			int xValue = (int)sets[i].getX();
+			int yValue = (int)sets[i].getY();
+			int outSetSize = sefofSetSize[i];
+			System.out.println("Parent (%d, %d) with size %d", xValue, yValue, parentSize);
+		}
+		// print third part of the result
+		for (int j = 0; j < parentSize; j++) {
+			//Point parent = unmap(sets[j])
+			int xValue = (int)sets[i].getX();
+			int yValue = (int)sets[i].getY();
+			int intParent = map(sets[i]);
+			// implement find boundaries
+			int[] boundariesValue = findBundaries(intParent);
+			System.out.println("Bounds for parent (%d, %d): %d<=x<=%d %d<=y<=%d", 
+				xValue, yValue, 
+				boundariesValue[0], boundariesValue[1],
+				boundariesValue[2], boundariesValue[3]);
+		}		
 	}
+
+
 
 	public static void main(String args[]) {
 		int m, n;
