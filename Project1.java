@@ -40,26 +40,32 @@ public class Project1 {
 	 * Reads input from user (pair of connections presented as points), store the input in a list  
 	 */
 	public void read_input() {
-		String inputLine = null;
+		String inputLine;
 		String[] twoLocation;
 
-		StdIn si = new StdIn(System.in);
-		System.out.println("Enter number of pairs of connections: ");
-		num_connect = si.readInt();
+		// StdIn si = new StdIn(System.in);
+		System.out.print("Enter number of pairs of connections: ");
+		num_connect = StdIn.readInt();
+		System.out.println(" read int successfully " + num_connect);
 
 		// initiate intPairs
-		intPairs = new int[num_connect * 2];
+		//intPairs = new int[num_connect * 2];
 
-		for (int i = 0; i < num_connect; i++) {
+		//for (int i = 0; i < num_connect; i++) {
+		while (!StdIn.isEmpty()) {	
 			// Read next line
-			inputLine = si.nextline();
+			inputLine = StdIn.readLine();
 			twoLocation = inputLine.split(" ");
-			Point p1 = new Point(twoLocation[0], twoLocation[1]);
-			int intP1 = map(p1);
-			intPairs.add(intP1);
-			Point p2 = new Point(twoLocation[2], twoLocation[3]);
-			int intP2 = map(p2);
-			intPairs.add(intP2);
+			// int x1 = Integer.parseInt(twoLocation[0]);
+			// int y1 = Integer.parseInt(twoLocation[1]);
+			// int x2 = Integer.parseInt(twoLocation[2]);
+			// int y2 = Integer.parseInt(twoLocation[3]);
+			// Point p1 = new Point(x1, y1);
+			// int intP1 = map(p1);
+			// intPairs.add(intP1);
+			// Point p2 = new Point(x2, y2);
+			// int intP2 = map(p2);
+			// intPairs.add(intP2);
 		}
 		
 	}
@@ -100,7 +106,7 @@ public class Project1 {
 			y -= 1;
 		}
 		// initilize P value
-		p = Point(x, y);
+		p = new Point(x, y);
 		return p;
 	}
 
@@ -111,23 +117,23 @@ public class Project1 {
 		// define parent count
 		int parent_count = 0;
 		// initiate weightedquickunion
-		uf = new WeightedQuickUnionUF(m*n);
+		qu = new WeightedQuickUnionUF(m*n);
 		// weighted quick union
-		int size_arraylistConnect = intpairs.size();
-		for (int i = 0; i < size_arraylistConnect - 1; i++) {
-			int p = intpairs[i];
-			int q = intpairs[i + 1];
-			if (uf.connected(p, q)) continue;
-            uf.union(p, q);
+		int size_arraylistConnect = intPairs.size();
+		for (int i = 0; i < size_arraylistConnect - 1; i = i + 2) {
+			int p = intPairs.get(i);
+			int q = intPairs.get(i + 1);
+			if (qu.connected(p, q)) continue;
+            qu.union(p, q);
             StdOut.println(p + " " + q);
 		}
-		parent = uf.getParent();
+		parent = qu.getParent();
 
 		// Put parent array into grid
 		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) ｛
-				gird[m][n] = parent[count];
-				count++;
+			for (int j = 0; j < n; j++) {
+				grid[m][n] = parent[parent_count];
+				parent_count++;
 			}
 		}
 
@@ -139,7 +145,7 @@ public class Project1 {
 	 */	
 	public ArrayList<Point> retrieve_connected_sets() {
 		// initiate point arraylist
-		new ArrayList<Point> listp = new ArrayList<Point>();
+		ArrayList<Point> listp = new ArrayList<Point>();
 		// define first parent point
 		// ************** do I need always check null? ************
 		int tem = 0;
@@ -194,8 +200,8 @@ public class Project1 {
 		int Ymax = 0;
 
 		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) ｛
-				if (gird[m][n] == candidate) {
+			for (int j = 0; j < n; j++) {
+				if (grid[m][n] == candidate) {
 					if (m < Xmin)
 						Xmin = m;
 					if (m > Xmax)
@@ -205,16 +211,15 @@ public class Project1 {
 					if (n > Ymax)
 						Ymax = n; 
 				}
-				
 			}
 		}
 
-		boundaries[0] = Xmin;
-		boundaries[1] = Xmax;
-		boundaries[2] = Ymin;
-		boundaries[3] = Ymax;
+		boundaryValue[0] = Xmin;
+		boundaryValue[1] = Xmax;
+		boundaryValue[2] = Ymin;
+		boundaryValue[3] = Ymax;
 
-		return bundaryValue;
+		return boundaryValue;
 	}
 
 	/**
@@ -225,7 +230,7 @@ public class Project1 {
 		// need to find set numeber - parents number perhaps
 
 		// define an arraylist for recording set size 
-		new ArrayList<integer> setofSetSize = new Arraylist<integer>();
+		ArrayList<Integer> setofSetSize = new ArrayList<Integer>();
 		// size of parent point
 		int parentSize = sets.size();
 		// set size count
@@ -247,27 +252,25 @@ public class Project1 {
 		}
 
 		// output the result
-		System.out.println("number of sets: %d", parentSize);
+		System.out.println("number of sets: " + parentSize);
 		// print second part of the result
 		for (int i = 0; i < parentSize; i++) {
 			//Point parent = unmap(sets[i])
-			int xValue = (int)sets[i].getX();
-			int yValue = (int)sets[i].getY();
-			int outSetSize = sefofSetSize[i];
-			System.out.println("Parent (%d, %d) with size %d", xValue, yValue, parentSize);
+			int xValue = (int)sets.get(i).getX();
+			int yValue = (int)sets.get(i).getY();
+			int outSetSize = setofSetSize.get(i);
+			System.out.println("Parent (" + xValue + "," + yValue + ") with size " + parentSize);
 		}
 		// print third part of the result
 		for (int j = 0; j < parentSize; j++) {
 			//Point parent = unmap(sets[j])
-			int xValue = (int)sets[i].getX();
-			int yValue = (int)sets[i].getY();
-			int intParent = map(sets[i]);
+			int xValue = (int)sets.get(j).getX();
+			int yValue = (int)sets.get(j).getY();
+			int intParent = map(sets.get(j));
 			// implement find boundaries
 			int[] boundariesValue = findBundaries(intParent);
-			System.out.println("Bounds for parent (%d, %d): %d<=x<=%d %d<=y<=%d", 
-				xValue, yValue, 
-				boundariesValue[0], boundariesValue[1],
-				boundariesValue[2], boundariesValue[3]);
+			System.out.println("Bounds for parent (" + xValue + "," + yValue + "): " + boundariesValue[0]
+			 + "<=x<=" + boundariesValue[1] + " " + boundariesValue[2] + "<=y<=" + boundariesValue[3]); 
 		}		
 	}
 
